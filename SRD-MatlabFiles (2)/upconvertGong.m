@@ -60,7 +60,7 @@ lowpassCoeffs = ones(1, FIRlength) / FIRlength;
 basebandOutput = 2*filter(lowpassCoeffs, 1, modulateAgain);
 basebandOutput = basebandOutput - mean(basebandOutput);
 
-%%% Playback signals
+%n%% Playback signals
 sound(basebandInput, fs);
 pause(tmax+1);
 sound(modulated, fs);
