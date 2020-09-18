@@ -53,23 +53,16 @@ modulated = (1 + basebandInput).* carrier;
 %%%    N in B = 2 pi / N = 2 pi f1 / fs, which gives
 %%%    N = fs / f1 (converted to integer).
 carrier = cos(2*pi*fc*t);
-modulateAgain = modulated .^ 2;
+modulateAgain = modulated .* carrier;
 
+%%% Use an odd-length FIR filter
 FIRlength = floor(fs/f1);
-FIRlength = 2*FIRlength;
-if 2*floor(FIRlength/2) == FIRlength
-    FIRlength = FIRlength - 1;
-end
 
 lowpassCoeffs = ones(1, FIRlength) / FIRlength;
 basebandOutput = 2*filter(lowpassCoeffs, 1, modulateAgain);
-% account for group delay
-GD = (FIRlength - 1)/2;
-
-basebandOutput(1:32) = [];
-basebandInput(end - 31:end) = [];
-
+basebandOutput = basebandOutput - mean(basebandOutput);
 plotspec(basebandOutput, 1/fs);
+
 
 mse = @(x,y) mean( (x-y).^2);
 

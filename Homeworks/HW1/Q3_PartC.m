@@ -23,9 +23,9 @@
 %%% Dominant frequencies are 520 (C5), 630 and 660 Hz (E5) from
 %%% ploting the spectrum: plotspec(basebandInput, 1/fs)
 %%% Maximum frequency of interest, f1, is 660 Hz.
-[basebandInput, fs] = audioread('gong.wav');
+[basebandInput, fs] = audioread('gong.wav'); 
 basebandInput = basebandInput'; % row to column transpose the vector 
-f1 = 660;
+f1 = 660; % specifying a frequency
 
 Ts = 1/fs;                           %%% Sampling time
 numSamples = length(basebandInput);
@@ -35,7 +35,7 @@ tmax = Ts * numSamples;
 
 %%% Upconvert using sinusoidal amplitude modulation
 %%% to be centered at frequency fc
-fc = 4*f1;
+fc = 4*f1; %upconverting by f1*4
 carrier = cos(2*pi*fc*t);
 modulated = (1 + basebandInput).* carrier;
 
@@ -53,15 +53,33 @@ modulated = (1 + basebandInput).* carrier;
 %%%    N in B = 2 pi / N = 2 pi f1 / fs, which gives
 %%%    N = fs / f1 (converted to integer).
 carrier = cos(2*pi*fc*t);
-modulateAgain = modulated .* carrier;
+modulateAgain = modulated .^ 2;
 
 FIRlength = floor(fs/f1);
+FIRlength = 2*FIRlength;
+if 2*floor(FIRlength/2) == FIRlength
+    FIRlength = FIRlength - 1;
+end
+
 lowpassCoeffs = ones(1, FIRlength) / FIRlength;
 basebandOutput = 2*filter(lowpassCoeffs, 1, modulateAgain);
+basebandOutput = basebandOutput .^ 0.5;
+
+% account for group delay
+GD = (FIRlength - 1)/2;
+
+basebandOutput(1:32) = [];
+basebandInput(end - 31:end) = [];
+
+plotspec(basebandOutput, 1/fs);
+
+mse = @(x,y) mean( (x-y).^2);
+
+disp(mse(basebandInput, basebandOutput));
 
 %%% Playback signals
 sound(basebandInput, fs);
-pause(tmax+1);
-sound(modulated, fs);
+%pause(tmax+1);
+%sound(modulated, fs);
 pause(tmax+1);
 sound(basebandOutput, fs);

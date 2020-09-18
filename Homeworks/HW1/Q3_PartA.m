@@ -55,14 +55,29 @@ modulated = (1 + basebandInput).* carrier;
 carrier = cos(2*pi*fc*t);
 modulateAgain = modulated .* carrier;
 
+%%% Use an odd-length FIR filter
 FIRlength = floor(fs/f1);
+if 2*floor(FIRlength/2) == FIRlength
+    FIRlength = FIRlength - 1;
+end
+
 lowpassCoeffs = ones(1, FIRlength) / FIRlength;
 basebandOutput = 2*filter(lowpassCoeffs, 1, modulateAgain);
 basebandOutput = basebandOutput - mean(basebandOutput);
+plotspec(basebandOutput, 1/fs);
+% account for group delay
+GD = (FIRlength - 1)/2;
+
+basebandOutput(1:32) = [];
+basebandInput(end - 31:end) = [];
+
+mse = @(x,y) mean( (x-y).^2);
+
+disp(mse(basebandInput, basebandOutput));
 
 %%% Playback signals
 sound(basebandInput, fs);
-pause(tmax+1);
-sound(modulated, fs);
+%pause(tmax+1);
+%sound(modulated, fs);
 pause(tmax+1);
 sound(basebandOutput, fs);
