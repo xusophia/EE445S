@@ -64,7 +64,8 @@ end
 lowpassCoeffs = ones(1, FIRlength) / FIRlength;
 basebandOutput = 2*filter(lowpassCoeffs, 1, modulateAgain);
 basebandOutput = basebandOutput - mean(basebandOutput);
-plotspec(basebandOutput, 1/fs);
+%plotspec(basebandInput, 1/fs);
+%plotspec(basebandOutput, 1/fs);
 % account for group delay
 GD = (FIRlength - 1)/2;
 

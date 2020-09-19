@@ -70,7 +70,7 @@ GD = (FIRlength - 1)/2;
 
 basebandOutput(1:32) = [];
 basebandInput(end - 31:end) = [];
-
+plotspec(basebandInput, 1/fs);
 plotspec(basebandOutput, 1/fs);
 
 mse = @(x,y) mean( (x-y).^2);

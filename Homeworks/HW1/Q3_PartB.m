@@ -55,8 +55,7 @@ modulated = (1 + basebandInput).* carrier;
 carrier = cos(2*pi*fc*t);
 modulateAgain = modulated .^ 2;
 
-FIRlength = floor(fs/f1);
-FIRlength = 2*FIRlength;
+FIRlength = floor(fs/f1)/2;
 if 2*floor(FIRlength/2) == FIRlength
     FIRlength = FIRlength - 1;
 end
@@ -66,9 +65,10 @@ basebandOutput = 2*filter(lowpassCoeffs, 1, modulateAgain);
 % account for group delay
 GD = (FIRlength - 1)/2;
 
-basebandOutput(1:32) = [];
-basebandInput(end - 31:end) = [];
+basebandOutput(1:GD) = [];
+basebandInput(end - (GD-1):end) = [];
 
+plotspec(basebandInput, 1/fs);
 plotspec(basebandOutput, 1/fs);
 
 mse = @(x,y) mean( (x-y).^2);
@@ -77,7 +77,7 @@ disp(mse(basebandInput, basebandOutput));
 
 %%% Playback signals
 sound(basebandInput, fs);
-%pause(tmax+1);
-%sound(modulated, fs);
+pause(tmax+1);
+sound(modulated, fs);
 pause(tmax+1);
 sound(basebandOutput, fs);
