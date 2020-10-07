@@ -1,5 +1,5 @@
 clear all
-N = 16000;
+N = 100;
 %% 1. Fill up these fields based on the instrunction.
 fs = 8000;                     %%% sampling freq. Hz
 fDesired = 1000;               %%% desired freq. Hz

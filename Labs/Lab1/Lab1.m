@@ -29,8 +29,8 @@ xlabel('w')
 ylabel('yt')
 
 % Warning 
-%f = abs(yt)
-%f = log10(f)
+f = abs(yt)
+f = log10(f)
 
 plot(w, f)
 xlabel('w')

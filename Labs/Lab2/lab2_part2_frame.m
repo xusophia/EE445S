@@ -3,7 +3,7 @@ fDesired = 500;               %%% desired freq. Hz
 w0 = 2*pi*fDesired/fs;        %%% discrete-time freq.
 N0 = fs / gcd(fDesired, fs);  %%% fundamental period
 
-buffer_size = 2^5
+buffer_size = 2^8
 tmax = 2;
 num_frames = ceil(tmax*fs/buffer_size);
 N = num_frames*buffer_size;

@@ -1,24 +1,4 @@
-%%% upconvertGong.m
-%%%
-%%% Demonstrates upconversion and downconversion
-%%%
-%%% by Prof. Brian L. Evans, bevans@ece.utexas.edu
-%%% The University of Texas at Austin
-%%%
-%%% Original version: August 28, 2015
-%%% Current version:  February 5, 2016
-%%%
-%%% This Matlab script will play three sounds:
-%%% (1) low-frequency signal (baseband signal)
-%%% (2) upconverted signal centered at a higher frequency,
-%%% (3) the downconverted signal,
-%%% The downconverted signal consists of the baseband
-%%% signal plus some higher frequency artifacts.
-%%%
-%%% Note: The gong.wav file must be on your path.
-%%%
-%%% addpath('/Users/brianevans/Courses/SRD-MatlabFiles');
-
+%%% Question 3 Part B
 %%% Read gong signal
 %%% Dominant frequencies are 520 (C5), 630 and 660 Hz (E5) from
 %%% ploting the spectrum: plotspec(basebandInput, 1/fs)
@@ -54,6 +34,7 @@ modulated = (1 + basebandInput).* carrier;
 %%%    N = fs / f1 (converted to integer).
 carrier = cos(2*pi*fc*t);
 modulateAgain = modulated .^ 2;
+plotspec(modulateAgain, 1/fs);
 
 FIRlength = floor(fs/f1)/2;
 if 2*floor(FIRlength/2) == FIRlength
@@ -68,8 +49,7 @@ GD = (FIRlength - 1)/2;
 basebandOutput(1:GD) = [];
 basebandInput(end - (GD-1):end) = [];
 
-plotspec(basebandInput, 1/fs);
-plotspec(basebandOutput, 1/fs);
+%plotspec(basebandInput, 1/fs);
 
 mse = @(x,y) mean( (x-y).^2);
 

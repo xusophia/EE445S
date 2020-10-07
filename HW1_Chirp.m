@@ -7,7 +7,7 @@ t = 0: 1/fs: 10;
 theta_t = 2*pi*(f0 + 0.5*fStep*t).*t;
 c_t = cos(theta_t);
 
- soundsc(c_t, fs);
+soundsc(c_t, fs);
 plotspec(c_t, 1/fs);
 
 blockSize = 1024;
