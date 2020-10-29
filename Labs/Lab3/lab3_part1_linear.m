@@ -32,10 +32,10 @@ for t = 1:length(T)
 
     % Compute discrete-time convolution
     y = 0;
-    for i = 1:FIRlength
-        y = y + x_buffer(i)*Num30(FIRlength-i+1); 
-    end
-%     y = y + x.*Num30'
+%     for i = 1:FIRlength
+%         y = y + x_buffer(i)*Num30(FIRlength-i+1); 
+%     end
+    y = y + x.*Num30'
 
     % Shift all elements by one to get the next input
     for i = FIRlength:-1:2
