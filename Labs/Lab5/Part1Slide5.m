@@ -1,5 +1,3 @@
-clear
-close all
 clc
 
 B = [-0.000000000000, -0.000033582004,-0.000136474727,-0.000308833079,-0.000546510297, ...
@@ -45,11 +43,14 @@ B = [-0.000000000000, -0.000033582004,-0.000136474727,-0.000308833079,-0.0005465
 -0.001918787050,-0.001545332178,-0.001179451533,-0.000840973030,	...
 -0.000546510297,-0.000308833079,-0.000136474727,-0.000033582004,-0.000000000000];
 
-%%
+% design raised cosine filter
+B = rcosdesign(1, 8, 20, 'normal');
 
-T = 200;
+
+
+T = 2000;
 data = [-15000, 15000];
-x = zeros(1,10);
+x = zeros(1,8);
 samplesPerSymbol = 20;
 
 
@@ -64,46 +65,32 @@ for t = 1:T
    end 
    y = 0;
    
-   for i = 0:9
+   for i = 0:7
        y = y + x(i+1) * B(counter + samplesPerSymbol*i + 1);
    end
    
    if counter == (samplesPerSymbol -1)
        counter = -1;
        
-       for i = 9:-1:1
+       for i = 7:-1:1
            x(i+1) = x(i);
        end
    end
    
    counter = counter + 1;
    
-   output(t) = y*cosine(mod(t,4)+1);  
+   output(t) = y;  
    
 end
 
-stem(1:T, output, '.-')
 
+prefiltered_output = filter(num_pre_filter, den_pre_filter, output);
+squared = prefiltered_output.^2;
+recovered_clock = filter(num_bp, den_bp, squared);
+yyaxis left
+hold on;
+stem(1:T, recovered_clock, '.-') % blue 
+yyaxis right
+stem(1:T, output, '.-') % red
 
-clear all
-T = 100;
-PN = zeros(1,T);
-states = zeros(1,T);
-state = uint32(2);
-
-for t = 1:T
-   % states(t) = state;
-   [new,state] = SSRG_update(state);
-   PN(t)=new;
-   disp(state)
-   
-end
-
-stem(1:T,PN);
-
-function[new,state] = SSRG_update(state)
-   value2bit = bitand(bitshift(state,-1),1);
-   value5bit = bitand(bitshift(state,-4),1);
-   new = bitxor(value2bit,value5bit);
-   state = bitor(bitshift(state,1),new);
-end
+% Dotting S

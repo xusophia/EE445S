@@ -57,10 +57,12 @@ samplesPerSymbol = 20;
 output = zeros(1,T);
 cosine = int32([1 0 -1 0]);
 counter = 0;
+symbol = 0;
 
 for t = 1:T    
    if counter == 0 
-       symbol = randi([0,1]); 
+%        symbol = randi([-1,1]); 
+        symbol = mod((symbol + 1), 2);
        x(1) = data(symbol+1);
    end 
    y = 0;
