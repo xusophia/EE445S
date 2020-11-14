@@ -2,13 +2,12 @@
 
 pnseq = 3*[1 1 -1 -1 1 1 -1 1 -1 -1 1 -1 -1 -1 -1 1 -1 1 -1 1 1 1 -1 1 1 -1 -1 -1 1 1 1];
 
-match_seq = repmat([-1, 0, 0, 0], [1, 40]);
 %TRANSMITTER
 % encode text string as T-spaced 4-PAM sequence
 str='01234 I wish I were an Oscar Meyer wiener 56789';
 m=letters2pam(str); % 4-level signal of length N
-m = [-3, +1, -1, -3, +1, m];
-% m = [-3, +1, m]
+m = [-1, +3, -3, 1, m];
+
 N=length(m); 
 % zero pad T-spaced symbol sequence to create upsampled
 % T/M-spaced sequence of scaled T-spaced pulses (T=1)
@@ -35,15 +34,11 @@ x3=2*filter(b,1,x2);           % LPF and scale signal
 % as a convolving filter; filter with pulse and normalize
 y=filter(fliplr(p)/(pow(p)*M),1,x3);
 % set delay to first symbol-sample and increment by M
-start_ind = 0.5*fl+M + 5;
+start_ind = 0.5*fl+M + 4*M;
 z=y(start_ind:M:N*M);           % downsample to symbol rate
 
-r = xcorr(match_seq, z);
+r = xcorr(z, pnseq);
 [val, ind] = max(r);
-headstart = length(z) - ind + 1;
-z = z(headstart: end); % start index going all the way to the end
-
-
 figure(2), plot([1:length(z)],z,'.') % plot soft decisions
 % decision device and symbol matching performance assessment
 mprime=quantalph(z,[-3,-1,1,3])'; % quantize alphabet
