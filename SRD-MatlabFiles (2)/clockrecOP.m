@@ -22,7 +22,7 @@ x=conv(r,matchfilt);               % convolve signal with matched filter
 tnow=l*m+1; tau=0; xs=zeros(1,n);   % initialize variables
 tausave=zeros(1,n); tausave(1)=tau; i=0;
 mu=0.05;                            % algorithm stepsize
-delta=0.1;                          % time for derivative
+delta=0.01;                          % time for derivative
 while tnow<length(x)-l*m            % run iteration
   i=i+1;
   xs(i)=interpsinc(x,tnow+tau,l);   % interp at tnow+tau

@@ -2,8 +2,7 @@
 N=1000; M=20; Ts=.0001;       % # symbols, oversampling factor
 time=Ts*(N*M-1); t=0:Ts:time; % sampling interval and time
 
-s1=pam(N,4,1); s2=pam(N,4,1); % length N real 4-level signals
-
+s1=pam(N,2,1); s2=pam(N,2,1); % length N real 4-level signals
 
 ps=hamming(M);                % pulse shape of width M
 fc=1000; th=-1.0; j=sqrt(-1); % carrier freq. and phase

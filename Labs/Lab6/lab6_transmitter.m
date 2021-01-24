@@ -32,38 +32,38 @@ pn_seq = reshape([...
 0,1,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,1,1,0,1,1,0,1,0,0,1,1,1,1,0,0
 1,1,0,1,0,1,0,1,1,0,0,0,0,1,0,1,1,1,0,1,1,0,1,0,0,0,1,1,0,0,0,0
 1,0,0,1,1,1,1,1,1,1,0,1,1,1,0,0,0,1,1,1,1,0,0,0,0,0,0,1,1,1,0,1],[1,1024]);
-header = 2*pn_seq - 1;
+header = 2*pn_seq-1;
 
-%% Upsample and apply the pulse shaping and modulation to the header
+%% load in the data and serialize it into a series of 2-PAM amplitudes
+data = reshape(imread('tree.png'),[1,128^2]); data = (2*data - 1);
+
+%% Scramble the data using a random sequence generated in matlab
+rng('default'); scrambler = 2*randi(2,1,length(data))-3; 
+data = data.*scrambler;
+
+%% combine the header and data to prepare for transmission
+x = [header,data];
+
+xI = x(1:2:end);
+xQ = x(2:2:end);
+%% Upsample and apply the pulse shaping filter
 fs = 48000;
 f0 = 5000;
 alpha = 1;
 L = 20;
 h = rcosdesign(alpha,8,L,'normal');
-y_header = conv(h,upsample(header,20));
-len  = (128^2 + 1024)*L + 160;
-t = 1:len;
-carrier = cos(t*2*pi*f0/fs); 
+yI = conv(h,upsample(xI,L)); % split for in-phase  
+yQ = conv(h,upsample(xQ,L)); % split for quadrature-phase
 
-%% Load the received signal and correlate with the header to offset
-load RX;
-r = xcorr(y_header.*carrier(1:length(y_header)), RX);
-[val,ind] = max(r);
-offset = length(RX) - ind;
-RX = RX(offset:offset + len-1);
+%% Modulate the signal to prepare for transmission
+t = 1:length(yI);
+cosine = cos(t*2*pi*f0/fs); % carrier signal (cosine)
+sine = sin(t*2*pi*f0/fs);   % carrier signal (sine)
+TX = yI.*cosine - yQ.*sine; % upconversion
 
-%% Demodulate, apply the matched filter, and downsample
-rx = conv(h,RX.*carrier); % downconversion and then LPF
-GD = (length(h)-1)/2;
-x_recovered = 2*(rx(2*GD+1:L:end-2*GD)>0)-1;
-data_recovered = x_recovered(1025:end);
-
-%% Multiply with the same random sequence to descramble the data
-rng('default'); scrambler = 2*randi(2,1,length(data_recovered))-3;
-data_recovered = (data_recovered.*scrambler) > 0;
-
-%% convert the sequence of bits back into an image for viewing
-img = (reshape(data_recovered,[128,128]));
-figure; imshow(img)
-imwrite(img,'received.png');
-
+save TX TX;
+for i = 7:-1:1
+    disp(i)
+    pause(1)
+end
+soundsc(TX,fs);

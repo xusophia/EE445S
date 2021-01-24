@@ -8,7 +8,7 @@ constel=2;                         % 2-pam constellation
 beta=0.2;                          % rolloff parameter for srrc
 l=50;                              % 1/2 length of pulse shape (in symbols)
 chan=[1];                          % T/m "channel"
-toffset=-0.3;                      % initial timing offset
+toffset= - 0.3;                      % initial timing offset
 pulshap=srrc(l,beta,m,toffset);    % srrc pulse shape
 s=pam(n,constel,1);                % random data sequence with var=1
 sup=zeros(1,n*m);                  % upsample the data by placing...
@@ -21,21 +21,21 @@ x=conv(r,matchfilt);               % convolve signal with matched filter
 % run clock recovery algorithm
 tnow=l*m+1; tau=0; xs=zeros(1,n);   % initialize variables
 tausave=zeros(1,n); tausave(1)=tau; i=0;
-mu=0.05;                            % algorithm stepsize
-episilon=0.1;                          % time for derivative
+episilon=0.01;                          % time for derivative
+mu=0.05; % algorithm stepsize
 N = 50;
-tmax = length(x) - l*m - (N*m)
+tmax = length(x) - l*m - (N*m);
 while tnow<tmax            % run iteration
   i=i+1;
   xs(i)=interpsinc(x,tnow+tau,l);   % interp at tnow+tau
   
   %%% Averaging:
-  dJdtau = 0
+  dJdtau = 0;
   for k = 1:N
-      x_deltap=interpsinc(x,tnow+tau+(k*m),l);  % value to right
-      x_deltam=interpsinc(x,tnow+tau + (k*m) -episilon,l);  % value to left
+      x_deltap=interpsinc(x,tnow + tau + (k*m),l);  % value to right
+      x_deltam=interpsinc(x,tnow + tau + (k*m) - episilon,l);  % value to left
       dx = x_deltap - x_deltam;
-      dJdtau = dJdtau + (x_deltap^3)*dx;
+      dJdtau = dJdtau + 4*(x_deltap^3)*dx;
   end
   
 %   dx=x_deltap-x_deltam;             % numerical derivative
